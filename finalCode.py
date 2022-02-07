@@ -33,13 +33,12 @@ def manageServos():
         for x in range(10):
             kits[kitIdx].servo[x].angle = servoData[kitIdx][x]
 #             kit2.servo[x].angle = servoData[1][x]
-#         kit4.servo[x].angle = angle
+#         kit4.servo[x].angle = 
 #         kit5.servo[x].angle = angle
 #         kit6.servo[x].angle = angle
 #         kit7.servo[x].angle = angle
 #         kit8.servo[x].angle = angle
-    
-    
+
 def gray2pixelate(gry):
     pixdata = gry.load()
     for x in range(gridsize):
@@ -51,10 +50,8 @@ def gray2pixelate(gry):
             avg = 0
             for x1 in range(int(gry.size[0]/gridsize)):
                 for y1 in range(int(gry.size[1]/gridsize)):
-                    
                     posx = res*x + x1
                     posy = res*y + y1
-                    
                     r = r + pixdata[posx, posy][0]
                     b = b + pixdata[posx, posy][1]
                     g = g + pixdata[posx, posy][2]
@@ -62,13 +59,14 @@ def gray2pixelate(gry):
             b = int(b/(size[0]/gridsize*size[0]/gridsize))
             g = int(g/(size[0]/gridsize*size[0]/gridsize))
             avg = int((r+b+g)/3)
-            
-            if(int(avg/255 * 150) + 15 > 95):
-                servoData[x][y] = 165
-            elif (int(avg/255 * 150) + 15 < 85):
+            if(int(avg/255 * 150) + 15 > 100):
                 servoData[x][y] = 15
             else:
-                servoData[x][y] = 90
+                servoData[x][y] = 165
+#            elif (int(avg/255 * 150) + 15 < 85):
+#                servoData[x][y] = 15
+#            else:
+#                servoData[x][y] = 90
 #             servoData[x][y] = int(avg/255 * 150) + 15
     manageServos()   
     return gry
@@ -82,12 +80,10 @@ def rgb2gray(rgb):
     return rgb
 
 def process(frame):
-    
     stream = io.BytesIO(frame.getvalue())
     img = Image.open(stream).convert("RGB")
     gray = rgb2gray(img)
     pixels = gray2pixelate(gray)
-    
 #     for i in servoData:
 #         for j in i:
 #             print(j, end=" ")
@@ -102,30 +98,22 @@ def process(frame):
     #print("saved")
     #image = Image.open(stream).convert("RGBA")
     
-
-
 with picamera.PiCamera() as camera:
     # Let the camera warm up for 2 seconds.
-    
     camera.resolution = (size)
     time.sleep(2)
     #camera.start_preview()
-#     
     stream = io.BytesIO()
     for frame in camera.capture_continuous(stream, format="jpeg", resize = size):
 #    for foo in camera.capture_continuous(stream, format="jpeg"):
         counter+=1
         #print("Captured " + str(counter) + " frame(s)")
-        
         process(frame)
         stream.truncate(0)
         stream.seek(0)
-        
         #print(counter)
-            
 #         if counter == 10:
 #              break
-
     print("done")
     #camera.stop_preview()
     camera.close()
